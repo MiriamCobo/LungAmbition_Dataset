@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Cobo Cano"
+  given-names: "Miriam"
+  orcid: " https://orcid.org/0000-0001-9208-9062"
+title: "Lung Ambition project software"
+version: 1.0.0
+doi:
+date-released: 2025-04-04
+url: "https://github.com/MiriamCobo/LungAmbition_Dataset.git"
