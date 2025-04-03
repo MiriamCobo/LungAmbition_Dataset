@@ -1,0 +1,1 @@
+nohup torchrun --nproc_per_node=2 --nnodes=1 mainBMY0.py > OutRun25march25DenseNet121_fold1.out 2>&1 &

@@ -1,0 +1,14 @@
+{
+    "gpu_device": "cuda:0",
+    "number_ord_classes": 3,
+    "epochs": 100,
+    "batch_size": 4,
+    "lr": 0.0001,
+    "crop_size": 32,
+    "train": true,
+    "test": true,
+    "model_name": "ResNetPretrained_crop32_smallDataAug_27march25",
+    "path_to_save_outputs": "/home/ubuntu/tenerife/data/LungAmbition/Images/ResultsBaselines_BMY0/3D/ResNet_crop32",
+    "name_output_file": "ResNetPretrained_crop32_smallDataAug_27march25.txt",
+    "margin_too_big_size": 0
+}
