@@ -8,7 +8,9 @@ Access to the dataset on Zenodo will be granted upon the signing of the institut
 
 ## Enviroment configuration
 
+```
 conda env create -f lungAmbpy3.yml
+```
 
 ## Image Models
 
