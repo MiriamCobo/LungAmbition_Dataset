@@ -18,7 +18,7 @@ Unzip LDCT_data.zip and set up in your computer. We recommend you use at least o
 
 ## Protein models
 
-Download Olink_proteomics.xlsx, process data as in \DataPreparation and run the models.
+Download Olink_proteomics.xlsx, process data as in \DataPreparation and run the models. In the biologically informed neural netowrk (BINN) model, set up the repository following the original code in https://github.com/InfectionMedicineProteomics/BINN
 
 ## Citation
 

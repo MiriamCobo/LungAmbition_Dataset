@@ -66,11 +66,9 @@ df_merged = pd.read_csv('/home/ubuntu/tenerife/data/LungAmbition/Excels_merged/L
 df_merged.loc[(df_merged['TimeYears_CT_blood'] == 5) & (df_merged['Group'] != 'Lung_Cancer'), 'TimeYears_CT_blood'] = 3
 y_target = df_merged[['ID_proteinData', 'Cancer_Status', 'TimeYears_CT_blood']]
 columns_to_drop=['ID_imagingData', 'Group', 'Cancer_Status', 
-                'TimeYears_blood', 'TimeMonths_blood', 'TimeYears_CT_blood', 'TimeMonths_CT_blood',
-                'Diff_Diag_Blood_TimeYears', 'LastFollow_upTimeYears', 
-                'Age', 'Sex', 'Body_mass_index','Smoking_status', 'Years_smoked', 'Smoking_pack_years',
-                'Family_history_lung_cancer','Personal_history_cancer', 'Stage_category',
-                'NRRD_File', 'SEG_Files']
+                'TimeYears_CT_blood', 'TimeMonths_CT_blood',
+                'Age', 'Sex', 'Smoking_Category',
+                'Stage_category','NRRD_File', 'SEG_Files']
 # for correct handling of TimeYears_CT_blood, if TimeYears_CT_blood is over 5 years, change it to 5 years
 # in df_merged column TimeYears_CT_blood change to 5 if its over 5 years for patients that are not in Lung_Cancer group
 

@@ -32,10 +32,10 @@ df_merged = pd.read_csv('/home/ubuntu/tenerife/data/LungAmbition/Excels_merged/L
 df_merged = df_merged[df_merged['GroupUpdated'].isin(['Lung_Cancer', 'Benign_Nodules', 'False_Positive'])]
 # retrieve IDs
 IDs = df_merged['ID_proteinData']
-columns_to_drop = ['ID_imagingData','Cancer_Status','TimeYears_blood','TimeMonths_blood',
-                            'TimeYears_CT_blood','TimeMonths_CT_blood','Diff_Diag_Blood_TimeYears','LastFollow_upTimeYears',
-                            'Age','Sex','Body_mass_index','Smoking_status','Years_smoked','Smoking_pack_years',
-                            'Family_history_lung_cancer','Personal_history_cancer','Stage_category','NRRD_File','SEG_Files', 'GroupUpdated']
+columns_to_drop = ['ID_imagingData','Cancer_Status',
+                            'TimeYears_CT_blood','TimeMonths_CT_blood',
+                            'Age','Sex','Smoking_Category',
+                            'Stage_category','NRRD_File','SEG_Files', 'GroupUpdated']
 
 df_merged = df_merged.drop(columns=columns_to_drop)
 if keep_false_positives_as_separate_test:

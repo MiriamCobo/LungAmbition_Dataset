@@ -29,16 +29,16 @@ sys.stdout=open(os.path.join(path_to_save_results, "run_out_"+name_file+".txt"),
 # save prints in a txt file
 original_stdout = sys.stdout
 
-df_merged = pd.read_csv('/home/ubuntu/tenerife/data/LungAmbition/Excels_merged/LungAmbitionMergedAllGroupUpdated3mar2025.csv')
+df_merged = pd.read_csv('df_merged.csv') # read data in df_merged
 # filter df_merged by GroupUpdated to keep only Lung_Cancer, Benign_Nodules and False_Positive
 df_merged = df_merged[df_merged['GroupUpdated'].isin(['Lung_Cancer', 'Benign_Nodules', 'False_Positive'])]
-columns_to_drop = ['ID_imagingData','Cancer_Status','TimeYears_blood','TimeMonths_blood',
-                            'TimeYears_CT_blood','TimeMonths_CT_blood','Diff_Diag_Blood_TimeYears','LastFollow_upTimeYears',
-                            'Age','Sex','Body_mass_index','Smoking_status','Years_smoked','Smoking_pack_years',
-                            'Family_history_lung_cancer','Personal_history_cancer','Stage_category','NRRD_File','SEG_Files', 'GroupUpdated']
+columns_to_drop = ['ID_imagingData','Cancer_Status',
+                            'TimeYears_CT_blood','TimeMonths_CT_blood',
+                            'Age','Sex','Smoking_Category',
+                            'Stage_category','NRRD_File','SEG_Files', 'GroupUpdated']
 
 df_merged = df_merged.drop(columns=columns_to_drop)
-df1=pd.read_csv('/home/ubuntu/tenerife/data/LungAmbition/Proteinas/OlinkCode_UniprotID.csv')
+df1=pd.read_csv('OlinkCode_UniprotID.csv')
 for column in df_merged.columns:
     if column == 'ID_proteinData' or column == 'Group':
         continue
