@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
     np.set_printoptions(precision=3)
     n_folds=3
-    path_to_folds_csv = f'/home/ubuntu/tenerife/data/ZZ_githubRepos/LungAmbition/Data_stratified_split/folds-def_{n_folds}folds'
+    path_to_folds_csv = f'Data_stratified_split/folds-def_{n_folds}folds' # read in your location
     keep_false_positives_as_separate_test = True
 
     parser = argparse.ArgumentParser(description="DenseNet")
@@ -101,7 +101,7 @@ if __name__ == "__main__":
     sys.stdout = open(os.path.join(config_args.path_to_save_outputs, config_args.name_output_file), mode='w')
     original_stdout = sys.stdout
 
-    df_merged = pd.read_csv('/home/ubuntu/tenerife/data/LungAmbition/Excels_merged/LungAmbitionMergedAllGroupUpdated3mar2025.csv')
+    df_merged = pd.read_csv('df_merged.csv') # read df_merged.csv in your location
     # filter df_merged by GroupUpdated to keep only Lung_Cancer, Benign_Nodules and False_Positive
     df_merged = df_merged[df_merged['GroupUpdated'].isin(['Lung_Cancer', 'Benign_Nodules', 'False_Positive'])]
     df_merged = df_merged[['ID_proteinData', 'Group', 'Stage_category', 'NRRD_File', 'SEG_Files', 'Cancer_Status', 'TimeYears_CT_blood']]
