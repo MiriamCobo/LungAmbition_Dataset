@@ -14,7 +14,7 @@ conda env create -f lungAmbpy3.yml
 
 ## Image Models
 
-Unzip LDCT_data.zip and set up in your computer. We recommend you use at least one GPU. Prepare config.json, process data as in \DataPreparation and run the models.
+Unzip LDCT_data.zip and set up in your computer. We recommend you use at least one GPU. Prepare config.json, process data as in \DataPreparation, creating the 3 folds and run the models.
 
 ## Protein models
 
