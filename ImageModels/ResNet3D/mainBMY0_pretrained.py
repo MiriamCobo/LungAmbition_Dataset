@@ -81,16 +81,16 @@ if __name__ == "__main__":
     df_merged = pd.read_csv('df_merged.csv') # read in your location
     # filter df_merged by GroupUpdated to keep only Lung_Cancer, Benign_Nodules and False_Positive
     df_merged = df_merged[df_merged['GroupUpdated'].isin(['Lung_Cancer', 'Benign_Nodules', 'False_Positive'])]
-    df_merged = df_merged[['ID_proteinData', 'Group', 'Stage_category', 'NRRD_File', 'SEG_Files', 'Cancer_Status', 'TimeYears_CT_blood']]
+    df_merged = df_merged[['ID_patient', 'Group', 'Stage_category', 'NRRD_File', 'SEG_Files', 'Cancer_Status', 'TimeYears_CT_blood']]
     df_merged['SEG_Files'] = df_merged['SEG_Files'].apply(ast.literal_eval)
     if keep_false_positives_as_separate_test:
         y_false_positives = df_merged[df_merged['Group'] == 'False_Positive']['Group']
         # convert label to 1
         y_false_positives = y_false_positives.replace({'False_Positive': 0})
-        ID_false_positives = df_merged[df_merged['Group'] == 'False_Positive']['ID_proteinData']
+        ID_false_positives = df_merged[df_merged['Group'] == 'False_Positive']['ID_patient']
         # create list to store wrong predicted false positives
         list_ID_wrong_predicted_false_positives = []
-        X_false_positives = df_merged[df_merged['Group'] == 'False_Positive'].drop(columns=['ID_proteinData', 'Group'])
+        X_false_positives = df_merged[df_merged['Group'] == 'False_Positive'].drop(columns=['ID_patient', 'Group'])
         # drop in df_cur rows where Group is False_Positive
         df_merged = df_merged[df_merged['Group'].isin(['Lung_Cancer', 'Benign_Nodules'])]
         print("Number of false positives:", X_false_positives.shape[0])
@@ -116,13 +116,13 @@ if __name__ == "__main__":
         print(f"Fold {fold+1}:")
         # read train, test and val indices for each fold
         fold_data = pd.read_csv(os.path.join(path_to_folds_csv, f'id2splitfold_{fold}.csv'))
-        train_index = fold_data[fold_data['split'] == 'train']['ID_proteinData']
-        test_index = fold_data[fold_data['split'] == 'test']['ID_proteinData']
-        val_index = fold_data[fold_data['split'] == 'val']['ID_proteinData']
+        train_index = fold_data[fold_data['split'] == 'train']['ID_patient']
+        test_index = fold_data[fold_data['split'] == 'test']['ID_patient']
+        val_index = fold_data[fold_data['split'] == 'val']['ID_patient']
         # get first train, text, val, then split into X_train, X_test, X_val and y_train, y_test, y_val
-        train = df_merged.loc[df_merged['ID_proteinData'].isin(train_index)]
-        test = df_merged.loc[df_merged['ID_proteinData'].isin(test_index)]
-        val = df_merged.loc[df_merged['ID_proteinData'].isin(val_index)]
+        train = df_merged.loc[df_merged['ID_patient'].isin(train_index)]
+        test = df_merged.loc[df_merged['ID_patient'].isin(test_index)]
+        val = df_merged.loc[df_merged['ID_patient'].isin(val_index)]
         # print number of samples in train, val and test for Malignancy 0 and 1
         print("Train, total benign nodules", train[train['Malignancy'] == 0].shape[0], "lung cancer", train[train['Malignancy'] == 1].shape[0])
         print("Val, total benign nodules", val[val['Malignancy'] == 0].shape[0], "lung cancer", val[val['Malignancy'] == 1].shape[0])

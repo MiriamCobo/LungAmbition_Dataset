@@ -359,7 +359,7 @@ def load_lungAmbition(df_merged, batch_size, spatial_size=[48, 48, 48], shuffle=
                     "image": img_path,
                     "seg": seg_path,
                     "mal": row["Malignancy"],
-                    "id": row["ID_proteinData"],
+                    "id": row["ID_patient"],
                     "seg_path": seg_path
                 })
     # Create the Dataset and DataLoader

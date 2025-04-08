@@ -56,7 +56,7 @@ sys.stdout=open(os.path.join(path_to_save_results, "run_out_"+name_file+"_5fold.
 original_stdout = sys.stdout
 
 df_merged = pd.read_csv('/home/ubuntu/tenerife/data/LungAmbition/Excels_merged/LungAmbitionMergedAll7nov2024.csv')
-# ignore columns 'ID_imagingData', 'Group', 'Cancer_Status', 'TimeYears_CT_blood',
+# ignore columns 'ID_patient', 'Group', 'Cancer_Status', 'TimeYears_CT_blood',
 # 'Diff_Diag_Blood_TimeYears_CT_blood', 'LastFollow_upTimeYears_CT_blood', 'Age', 'Sex', 
 # 'Body_mass_index','Smoking_status', 'Years_smoked', 'Smoking_pack_years', 
 # 'Family_history_lung_cancer','Personal_history_cancer', 'Stage_category','NRRD_File', 'SEG_Files'
@@ -64,8 +64,8 @@ df_merged = pd.read_csv('/home/ubuntu/tenerife/data/LungAmbition/Excels_merged/L
 # for correct handling of TimeYears_CT_blood, if TimeYears_CT_blood is over 5 years, change it to 5 years
 # in df_merged column TimeYears_CT_blood change to 5 if its over 5 years for patients that are not in Lung_Cancer group
 df_merged.loc[(df_merged['TimeYears_CT_blood'] == 5) & (df_merged['Group'] != 'Lung_Cancer'), 'TimeYears_CT_blood'] = 3
-y_target = df_merged[['ID_proteinData', 'Cancer_Status', 'TimeYears_CT_blood']]
-columns_to_drop=['ID_imagingData', 'Group', 'Cancer_Status', 
+y_target = df_merged[['ID_patient', 'Cancer_Status', 'TimeYears_CT_blood']]
+columns_to_drop=['ID_patient', 'Group', 'Cancer_Status', 
                 'TimeYears_CT_blood', 'TimeMonths_CT_blood',
                 'Age', 'Sex', 'Smoking_Category',
                 'Stage_category','NRRD_File', 'SEG_Files']
@@ -108,32 +108,32 @@ for file_path in sorted(glob.glob(os.path.join(path_to_fold_division_folder, 'id
     print("=" * 80)
     print(f"Fold {fold + 1}:")
     # based on df_fold.split (train, test, val, test_false_positive) asign in df_merged the corresponding fold
-    # Get the ID_proteinData values for each split in df_fold
-    train_ids = df_fold[df_fold['split'] == 'train']['ID_proteinData'].tolist()
-    val_ids = df_fold[df_fold['split'] == 'val']['ID_proteinData'].tolist()
-    test_ids = df_fold[df_fold['split'] == 'test']['ID_proteinData'].tolist()
+    # Get the ID_patient values for each split in df_fold
+    train_ids = df_fold[df_fold['split'] == 'train']['ID_patient'].tolist()
+    val_ids = df_fold[df_fold['split'] == 'val']['ID_patient'].tolist()
+    test_ids = df_fold[df_fold['split'] == 'test']['ID_patient'].tolist()
     if keep_false_positives_as_separate_test:
-        false_positive_ids = df_fold[df_fold['split'] == 'test_false_positive']['ID_proteinData'].tolist()
+        false_positive_ids = df_fold[df_fold['split'] == 'test_false_positive']['ID_patient'].tolist()
         # Get the corresponding rows from df_merged
-        X_test_false_positives = df_merged[df_merged['ID_proteinData'].isin(false_positive_ids)]
-        y_test_false_positives = df_merged[df_merged['ID_proteinData'].isin(false_positive_ids)][['Cancer_Status', 'TimeYears_CT_blood']]
-        ID_false_positives = X_test_false_positives['ID_proteinData'].values
+        X_test_false_positives = df_merged[df_merged['ID_patient'].isin(false_positive_ids)]
+        y_test_false_positives = df_merged[df_merged['ID_patient'].isin(false_positive_ids)][['Cancer_Status', 'TimeYears_CT_blood']]
+        ID_false_positives = X_test_false_positives['ID_patient'].values
         X_test_false_positives = X_test_false_positives.drop(columns=columns_to_drop)
-        X_test_false_positives = X_test_false_positives.drop(columns=['ID_proteinData'])
+        X_test_false_positives = X_test_false_positives.drop(columns=['ID_patient'])
         print("False positives data:", X_test_false_positives.shape, y_test_false_positives.shape, 
               "Test false positives:", len(y_test_false_positives[y_test_false_positives.Cancer_Status == 0]))
     else:
         # include false positives in test
-        test_ids = test_ids + df_fold[df_fold['split'] == 'test_false_positive']['ID_proteinData'].tolist()
+        test_ids = test_ids + df_fold[df_fold['split'] == 'test_false_positive']['ID_patient'].tolist()
 
     # Filter X and y_target based on these lists of IDs
-    X_train = X[X['ID_proteinData'].isin(train_ids)].drop(columns=['ID_proteinData'])
-    X_val = X[X['ID_proteinData'].isin(val_ids)].drop(columns=['ID_proteinData'])
-    X_test = X[X['ID_proteinData'].isin(test_ids)].drop(columns=['ID_proteinData'])
-    # ver que hacer con false_positives, eliminar ID_proteinData
-    y_train = y_target[y_target['ID_proteinData'].isin(train_ids)].drop(columns=['ID_proteinData'])
-    y_val = y_target[y_target['ID_proteinData'].isin(val_ids)].drop(columns=['ID_proteinData'])
-    y_test = y_target[y_target['ID_proteinData'].isin(test_ids)].drop(columns=['ID_proteinData'])
+    X_train = X[X['ID_patient'].isin(train_ids)].drop(columns=['ID_patient'])
+    X_val = X[X['ID_patient'].isin(val_ids)].drop(columns=['ID_patient'])
+    X_test = X[X['ID_patient'].isin(test_ids)].drop(columns=['ID_patient'])
+    # ver que hacer con false_positives, eliminar ID_patient
+    y_train = y_target[y_target['ID_patient'].isin(train_ids)].drop(columns=['ID_patient'])
+    y_val = y_target[y_target['ID_patient'].isin(val_ids)].drop(columns=['ID_patient'])
+    y_test = y_target[y_target['ID_patient'].isin(test_ids)].drop(columns=['ID_patient'])
 
     print("Training data:", X_train.shape, y_train.shape, 
           "Benigns train:", len(y_train[y_train.Cancer_Status == 0]), "Lung cancer patients train:", len(y_train[y_train.Cancer_Status == 1]))

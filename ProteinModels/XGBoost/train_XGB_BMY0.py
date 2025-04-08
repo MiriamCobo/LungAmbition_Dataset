@@ -29,7 +29,7 @@ original_stdout = sys.stdout
 df_merged = pd.read_csv('/home/ubuntu/tenerife/data/LungAmbition/Excels_merged/LungAmbitionMergedAllGroupUpdated3mar2025.csv')
 # filter df_merged by GroupUpdated to keep only Lung_Cancer, Benign_Nodules and False_Positive
 df_merged = df_merged[df_merged['GroupUpdated'].isin(['Lung_Cancer', 'Benign_Nodules', 'False_Positive'])]
-columns_to_drop = ['ID_imagingData','Cancer_Status',
+columns_to_drop = ['ID_patient','Cancer_Status',
                             'TimeYears_CT_blood','TimeMonths_CT_blood',
                             'Age','Sex','Smoking_Category',
                             'Stage_category','NRRD_File','SEG_Files', 'GroupUpdated']
@@ -39,10 +39,10 @@ if keep_false_positives_as_separate_test:
     y_false_positives = df_merged[df_merged['Group'] == 'False_Positive']['Group']
     # convert label to 1
     y_false_positives = y_false_positives.replace({'False_Positive': 0})
-    ID_false_positives = df_merged[df_merged['Group'] == 'False_Positive']['ID_proteinData']
+    ID_false_positives = df_merged[df_merged['Group'] == 'False_Positive']['ID_patient']
     # create list to store wrong predicted false positives
     list_ID_wrong_predicted_false_positives = []
-    X_false_positives = df_merged[df_merged['Group'] == 'False_Positive'].drop(columns=['ID_proteinData', 'Group'])
+    X_false_positives = df_merged[df_merged['Group'] == 'False_Positive'].drop(columns=['ID_patient', 'Group'])
     # drop in df_cur rows where Group is False_Positive
     df_merged = df_merged[df_merged['Group'].isin(['Lung_Cancer', 'Benign_Nodules'])]
     print("Number of false positives:", X_false_positives.shape[0])
@@ -67,20 +67,20 @@ for fold in range(0, n_folds):
     print(f"Fold {fold + 1}:")
     # read train, test and val indices for each fold
     fold_data = pd.read_csv(os.path.join(path_to_folds_csv, f'id2splitfold_{fold}.csv'))
-    # get corresponding ID_proteinData for split (train, test, val) in fold_data and read then in df_cur, 
-    # loc the rows in df_merged with ID_proteinData in df_cur
-    train_index = fold_data[fold_data['split'] == 'train']['ID_proteinData']
-    test_index = fold_data[fold_data['split'] == 'test']['ID_proteinData']
-    val_index = fold_data[fold_data['split'] == 'val']['ID_proteinData']
+    # get corresponding ID_patient for split (train, test, val) in fold_data and read then in df_cur, 
+    # loc the rows in df_merged with ID_patient in df_cur
+    train_index = fold_data[fold_data['split'] == 'train']['ID_patient']
+    test_index = fold_data[fold_data['split'] == 'test']['ID_patient']
+    val_index = fold_data[fold_data['split'] == 'val']['ID_patient']
     # get first train, text, val, then split into X_train, X_test, X_val and y_train, y_test, y_val
-    train = df_merged.loc[df_merged['ID_proteinData'].isin(train_index)]
-    test = df_merged.loc[df_merged['ID_proteinData'].isin(test_index)]
-    val = df_merged.loc[df_merged['ID_proteinData'].isin(val_index)]
-    X_train = train.drop(columns=['ID_proteinData', 'Group'])
+    train = df_merged.loc[df_merged['ID_patient'].isin(train_index)]
+    test = df_merged.loc[df_merged['ID_patient'].isin(test_index)]
+    val = df_merged.loc[df_merged['ID_patient'].isin(val_index)]
+    X_train = train.drop(columns=['ID_patient', 'Group'])
     y_train = y_target.loc[y_target.index.isin(X_train.index)]
-    X_test = test.drop(columns=['ID_proteinData', 'Group'])
+    X_test = test.drop(columns=['ID_patient', 'Group'])
     y_test = y_target.loc[y_target.index.isin(X_test.index)]
-    X_val = val.drop(columns=['ID_proteinData', 'Group'])
+    X_val = val.drop(columns=['ID_patient', 'Group'])
     y_val = y_target.loc[y_target.index.isin(X_val.index)]
 
     print("Training data:", X_train.shape, y_train.shape, "Benign patients train:", len(y_train[y_train == 0]), "Lung cancer patients train:", len(y_train[y_train == 1]))
@@ -187,7 +187,7 @@ for fold in range(0, n_folds):
     # evaluate separately model on false positives:
     if keep_false_positives_as_separate_test:
         if not isinstance(X_false_positives, pd.DataFrame):
-            X_false_positives = pd.DataFrame(X_false_positives, columns=df_merged.drop(columns=['ID_proteinData', 'Group']).columns)
+            X_false_positives = pd.DataFrame(X_false_positives, columns=df_merged.drop(columns=['ID_patient', 'Group']).columns)
         X_false_positives = scaler.transform(X_false_positives)
         y_false_positives_pred_prob = best_xgb.predict_proba(X_false_positives)
         y_false_positives_pred = best_xgb.predict(X_false_positives)

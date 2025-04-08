@@ -32,7 +32,7 @@ original_stdout = sys.stdout
 df_merged = pd.read_csv('df_merged.csv') # read data in df_merged
 # filter df_merged by GroupUpdated to keep only Lung_Cancer, Benign_Nodules and False_Positive
 df_merged = df_merged[df_merged['GroupUpdated'].isin(['Lung_Cancer', 'Benign_Nodules', 'False_Positive'])]
-columns_to_drop = ['ID_imagingData','Cancer_Status',
+columns_to_drop = ['ID_patient','Cancer_Status',
                             'TimeYears_CT_blood','TimeMonths_CT_blood',
                             'Age','Sex','Smoking_Category',
                             'Stage_category','NRRD_File','SEG_Files', 'GroupUpdated']
@@ -40,7 +40,7 @@ columns_to_drop = ['ID_imagingData','Cancer_Status',
 df_merged = df_merged.drop(columns=columns_to_drop)
 df1=pd.read_csv('OlinkCode_UniprotID.csv')
 for column in df_merged.columns:
-    if column == 'ID_proteinData' or column == 'Group':
+    if column == 'ID_patient' or column == 'Group':
         continue
     if column in df1['Assay'].values:
         df_merged = df_merged.rename(columns
@@ -54,11 +54,11 @@ if keep_false_positives_as_separate_test:
     y_false_positives = df_merged[df_merged['Group'] == 'False_Positive']['Group']
     # convert label to 1
     y_false_positives = y_false_positives.replace({'False_Positive': 0})
-    ID_false_positives = df_merged[df_merged['Group'] == 'False_Positive']['ID_proteinData']
+    ID_false_positives = df_merged[df_merged['Group'] == 'False_Positive']['ID_patient']
     # create list to store wrong predicted false positives
     list_ID_wrong_predicted_false_positives = []
     test_false_positives=df_merged[df_merged['Group'] == 'False_Positive']
-    X_false_positives = df_merged[df_merged['Group'] == 'False_Positive'].drop(columns=['ID_proteinData', 'Group'])
+    X_false_positives = df_merged[df_merged['Group'] == 'False_Positive'].drop(columns=['ID_patient', 'Group'])
     # drop in df_cur rows where Group is False_Positive
     df_merged = df_merged[df_merged['Group'].isin(['Lung_Cancer', 'Benign_Nodules'])]
     print("Number of false positives:", X_false_positives.shape[0])
@@ -83,22 +83,22 @@ for fold in range(0, n_folds):
     print(f"Fold {fold + 1}:")
     # read train, test and val indices for each fold
     fold_data = pd.read_csv(os.path.join(path_to_folds_csv, f'id2splitfold_{fold}.csv'))
-    # get corresponding ID_proteinData for split (train, test, val) in fold_data and read then in df_cur, 
-    # loc the rows in df_merged with ID_proteinData in df_cur
-    train_index = fold_data[fold_data['split'] == 'train']['ID_proteinData']
-    test_index = fold_data[fold_data['split'] == 'test']['ID_proteinData']
-    val_index = fold_data[fold_data['split'] == 'val']['ID_proteinData']
+    # get corresponding ID_patient for split (train, test, val) in fold_data and read then in df_cur, 
+    # loc the rows in df_merged with ID_patient in df_cur
+    train_index = fold_data[fold_data['split'] == 'train']['ID_patient']
+    test_index = fold_data[fold_data['split'] == 'test']['ID_patient']
+    val_index = fold_data[fold_data['split'] == 'val']['ID_patient']
     # get first train, text, val, then split into X_train, X_test, X_val and y_train, y_test, y_val
-    train = df_merged.loc[df_merged['ID_proteinData'].isin(train_index)]
-    test = df_merged.loc[df_merged['ID_proteinData'].isin(test_index)]
-    val = df_merged.loc[df_merged['ID_proteinData'].isin(val_index)]
+    train = df_merged.loc[df_merged['ID_patient'].isin(train_index)]
+    test = df_merged.loc[df_merged['ID_patient'].isin(test_index)]
+    val = df_merged.loc[df_merged['ID_patient'].isin(val_index)]
     # join train and val together in train_val
     train_val = pd.concat([train, val], axis=0)
-    X_train = train.drop(columns=['ID_proteinData', 'Group'])
+    X_train = train.drop(columns=['ID_patient', 'Group'])
     y_train = y_target.loc[y_target.index.isin(X_train.index)]
-    X_test = test.drop(columns=['ID_proteinData', 'Group'])
+    X_test = test.drop(columns=['ID_patient', 'Group'])
     y_test = y_target.loc[y_target.index.isin(X_test.index)]
-    X_val = val.drop(columns=['ID_proteinData', 'Group'])
+    X_val = val.drop(columns=['ID_patient', 'Group'])
     y_val = y_target.loc[y_target.index.isin(X_val.index)]
     
     print("Training data:", X_train.shape, y_train.shape, "Benign patients train:", len(y_train[y_train == 0]), "Lung cancer patients train:", len(y_train[y_train == 1]))
@@ -122,7 +122,7 @@ for fold in range(0, n_folds):
     X_train = scaler.fit_transform(X_train)
     X_test = scaler.transform(X_test)
     # Create the data matrix with Protein column (Transposed for BINN compatibility)
-    train_data_matrix = pd.DataFrame(X_train, columns=train_val.drop(columns=['ID_proteinData', 'Group']).columns, index=train_val['ID_proteinData'])
+    train_data_matrix = pd.DataFrame(X_train, columns=train_val.drop(columns=['ID_patient', 'Group']).columns, index=train_val['ID_patient'])
     train_data_matrix = train_data_matrix.T
     train_data_matrix.insert(0, 'Protein', train_data_matrix.index)
     train_data_matrix.reset_index(drop=True, inplace=True)
@@ -130,7 +130,7 @@ for fold in range(0, n_folds):
     print("Data Matrix Shape:", train_data_matrix.shape)
     # print("Data Matrix Sample:", train_data_matrix.head())
     # test data matrix
-    test_data_matrix = pd.DataFrame(X_test, columns=test.drop(columns=['ID_proteinData', 'Group']).columns, index=test['ID_proteinData'])
+    test_data_matrix = pd.DataFrame(X_test, columns=test.drop(columns=['ID_patient', 'Group']).columns, index=test['ID_patient'])
     test_data_matrix = test_data_matrix.T
     test_data_matrix.insert(0, 'Protein', test_data_matrix.index)
     test_data_matrix.reset_index(drop=True, inplace=True)
@@ -138,10 +138,10 @@ for fold in range(0, n_folds):
     print("Test Data Matrix Shape:", test_data_matrix.shape)
     
     # Create the design matrix
-    train_design_matrix = pd.DataFrame({'sample': train_val['ID_proteinData'].values, 'group': y_train})
+    train_design_matrix = pd.DataFrame({'sample': train_val['ID_patient'].values, 'group': y_train})
     # print("Design matrix head:", train_design_matrix.head())
     print("Design matrix shape:", train_design_matrix.shape)
-    test_design_matrix = pd.DataFrame({'sample': test['ID_proteinData'].values, 'group': y_test})
+    test_design_matrix = pd.DataFrame({'sample': test['ID_patient'].values, 'group': y_test})
     # print("Test Design matrix head:", test_design_matrix.head())
     print("Test Design matrix shape:", test_design_matrix.shape)
     
@@ -251,14 +251,14 @@ for fold in range(0, n_folds):
         # scale the data using StandardScaler
         X_false_positives_scaled = scaler.transform(X_false_positives)
         # create data matrix for false positives
-        false_positives_data_matrix = pd.DataFrame(X_false_positives_scaled, columns=test_false_positives.drop(columns=['ID_proteinData', 'Group']).columns, index=test_false_positives['ID_proteinData'])
+        false_positives_data_matrix = pd.DataFrame(X_false_positives_scaled, columns=test_false_positives.drop(columns=['ID_patient', 'Group']).columns, index=test_false_positives['ID_patient'])
         false_positives_data_matrix = false_positives_data_matrix.T
         false_positives_data_matrix.insert(0, 'Protein', false_positives_data_matrix.index)
         false_positives_data_matrix.reset_index(drop=True, inplace=True)
         print("False Positives Data Matrix Columns:", false_positives_data_matrix.columns)
         print("False Positives Data Matrix Shape:", false_positives_data_matrix.shape)
         # Create the design matrix for false positives
-        false_positives_design_matrix = pd.DataFrame({'sample': test_false_positives['ID_proteinData'].values, 'group': y_false_positives})
+        false_positives_design_matrix = pd.DataFrame({'sample': test_false_positives['ID_patient'].values, 'group': y_false_positives})
         print("False Positives Design matrix head:", false_positives_design_matrix.head())
         print("False Positives Design matrix shape:", false_positives_design_matrix.shape)
         # Create DataLoader for false positives
