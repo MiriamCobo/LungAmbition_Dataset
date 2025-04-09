@@ -1,4 +1,4 @@
-# Lung Ambition project, Pamplona-ELCAP dataset
+# Pamplona-ELCAP (P-ELCAP/CCUN) dataset
 
 The code to process and run technical validation experiments.
 

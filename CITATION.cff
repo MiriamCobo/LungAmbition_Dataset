@@ -4,8 +4,8 @@ authors:
 - family-names: "Cobo Cano"
   given-names: "Miriam"
   orcid: " https://orcid.org/0000-0001-9208-9062"
-title: "Lung Ambition project software"
+title: "P-ELCAP/CCUN project software"
 version: 1.0.0
 doi:
 date-released: 2025-04-04
-url: "https://github.com/MiriamCobo/LungAmbition_Dataset.git"
+url: "https://github.com/MiriamCobo/P-ELCAP_Dataset"
