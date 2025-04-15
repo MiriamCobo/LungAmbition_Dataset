@@ -6,19 +6,17 @@ from sklearn.model_selection import StratifiedKFold, train_test_split
 import os
 from matplotlib.font_manager import FontProperties
 
-def create_stratified_folds(df_cur, bins, labels, n_splits=5, random_state=1, val_split=0.10):
+def create_stratified_folds(df_cur, n_splits=5, random_state=1, val_split=0.10):
     # Update the Group variable to Group_stage variable to include subgroups for Lung_Cancer patients
     df_cur['Group_stage'] = df_cur['GroupUpdated']
     df_cur.loc[df_cur['Group_stage'] == 'Lung_Cancer', 'Group_stage'] = df_cur.apply(
         lambda x: f'Lung_Cancer_{x["Stage_category"]}' if pd.notna(x['Stage_category']) else 'Lung_Cancer', axis=1
     )
 
-    # Create Age groups and combine with other variables
-    df_cur['Age_Group'] = pd.cut(df_cur['Age'], bins=bins, labels=labels, right=False)
-    df_cur['Grouping_Variable'] = df_cur['Sex'].astype(str) + '_' + df_cur['Age_Group'].astype(str)
+    df_cur['Grouping_Variable'] = df_cur['Sex'].astype(str) + '_' + df_cur['Age'].astype(str)
 
     df_cur['Fine_Grained_Group'] = (df_cur['Group_stage'] + "_" + df_cur['Sex'].astype(str) + 
-                                    "_" + df_cur['Age_Group'].astype(str) +
+                                    "_" + df_cur['Age'].astype(str) +
                                     "_" + df_cur['Smoking_Category'])
 
     sgkf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=random_state)
@@ -40,7 +38,7 @@ def create_stratified_folds(df_cur, bins, labels, n_splits=5, random_state=1, va
 
     return fold_data
 
-def plot_distributions(df_cur, fold_data, bins, save_plots=False, output_folder=None):
+def plot_distributions(df_cur, fold_data, save_plots=False, output_folder=None):
     for fold_number, indices in fold_data.items():
         train_data = df_cur.iloc[indices['train_index']]
         val_data = df_cur.iloc[indices['val_index']]
@@ -76,11 +74,10 @@ def plot_distributions(df_cur, fold_data, bins, save_plots=False, output_folder=
                 '#fb6a4a']  # Light red/salmon  # Train, Validation, Test colors
 
         # --- Age Distribution ---
-        age_bins = pd.cut(df_cur['Age'], bins=bins)
         age_dist = pd.DataFrame({
-            'Train': train_data['Age'].groupby(age_bins).size(),
-            'Validation': val_data['Age'].groupby(age_bins).size(),
-            'Test': test_data['Age'].groupby(age_bins).size()
+            'Train': train_data['Age'].value_counts().sort_index(),
+            'Validation': val_data['Age'].value_counts().sort_index(),
+            'Test': test_data['Age'].value_counts().sort_index()
         }).fillna(0)
         age_dist.plot(kind='bar', stacked=True, ax=axes[0, 0], color=colors, edgecolor='black', legend=False)
 
